@@ -110,6 +110,8 @@ The sections as enumerated below will walk you through the process of creating a
 3. Open the Amazon Chime SDK serverless demo application using the link which was obtained in the previous step in multiple tabs [in any web browser supported by the Amazon Chime SDK](https://docs.aws.amazon.com/chime/latest/dg/meetings-sdk.html#mtg-browsers) to simulate several participant joins. Optionally enable video or content sharing modalities for each participant in addition to audio.
 
     **NOTE:** This would be the `meetingURL` that would be used later for passing as a parameter to the `StartRecording` API. It would look something like this `https://abcdefghij.execute-api.us-east-1.amazonaws.com/Prod/?m=<meeting-id>`. See the screenshot below to see the URL highlighted in the red box.
+
+    `filename` that would be used later for passing as a optionam parameter to the `StartRecording` API.
     
     ![Serverless demo](https://github.com/aws-samples/amazon-chime-sdk-recording-demo/blob/master/resources/serverless-demo-app-meeting-url.png)
     
@@ -128,6 +130,7 @@ There are multiple ways for [invoking a REST API in Amazon API Gateway](https://
     ![postman auth](https://github.com/aws-samples/amazon-chime-sdk-recording-demo/blob/master/resources/postman-app-auth-tab.png)
 
 2. Start recording by passing `start` to `recordingAction` and a **url encoded** to `meetingURL` for our demo application as query parameters in the POST request to API Gateway.
+    Use `filename` to override default filename.
 
     ![start recording](https://github.com/aws-samples/amazon-chime-sdk-recording-demo/blob/master/resources/postman-app-start-recording.png)
 

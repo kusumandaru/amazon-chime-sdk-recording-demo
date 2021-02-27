@@ -25,6 +25,7 @@ let response = {
  
 exports.handler = function(event, context, callback) {
     let meetingURL = "";
+    let filename = "";
     let taskId = "";
     let recordingAction = "";
     
@@ -41,7 +42,16 @@ exports.handler = function(event, context, callback) {
             if(event.queryStringParameters && event.queryStringParameters.meetingURL) {
                 console.log("Meeting URL: " + event.queryStringParameters.meetingURL);
                 meetingURL = decodeURIComponent(event.queryStringParameters.meetingURL);
-                return startRecording(event, context, callback, meetingURL);
+
+                if (event.queryStringParameters.filename === "") {
+                    console.log("Filename not filled");
+                    filename = ""
+                } else {
+                    console.log("Filename: " + event.queryStringParameters.filename);
+                    filename = decodeURIComponent(event.queryStringParameters.filename);
+                }
+                
+                return startRecording(event, context, callback, meetingURL, filename);
             } else {
                 responseBody = {
                     message: "Missing parameter: meetingURL",
@@ -87,7 +97,7 @@ exports.handler = function(event, context, callback) {
     callback(null, response);
 };
 
-function startRecording(event, context, callback, meetingUrl) {
+function startRecording(event, context, callback, meetingUrl, filename) {
     let ecsRunTaskParams = {
         cluster: ecsClusterArn,
         launchType: "EC2",
@@ -99,6 +109,10 @@ function startRecording(event, context, callback, meetingUrl) {
                         { 
                             name: "MEETING_URL",
                             value: meetingUrl
+                        },
+                        { 
+                            name: "FILENAME",
+                            value: filename
                         },
                         {
                             name: "RECORDING_ARTIFACTS_BUCKET",
@@ -125,7 +139,18 @@ function startRecording(event, context, callback, meetingUrl) {
         else {
             console.log(data);  // successful response
             response.statusCode = 200;
-            response.body = JSON.stringify((data.tasks.length && data.tasks[0].taskArn) ? data.tasks[0].taskArn : data, null, ' ');
+            if (data.tasks.length && data.tasks[0].taskArn) {
+                responseBody = {
+                    arn: data.tasks[0].taskArn,
+                    filename: filename
+                };
+            } else {
+                responseBody = {
+                    message: data
+                };
+            }
+            
+            response.body = JSON.stringify(responseBody, null, ' ');
             context.succeed(response);
         }
     });
